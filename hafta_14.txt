@@ -1,0 +1,52 @@
+Yanki Uslu
+
+select sut_lt,musteri_kodu
+from alinan_sut
+where sut_lt<(select AVG(sut_lt)from alinan_sut)
+
+select musteri_kodu,sum(sut_lt) as hesap
+from alinan_sut
+group by musteri_kodu
+
+select avg(hesap)  as ortalama
+from (select musteri_kodu,sum(sut_tutar) as hesap
+from alinan_sut
+group by musteri_kodu) as yeni_tablo
+
+select alinan_sut.musteri_kodu,sum(sut_tutar),sum(urun_tutar)
+from alinan_sut
+inner join alinan_urun on alinan_sut.musteri_kodu=alinan_urun.musteri_kodu
+group by alinan_sut.musteri_kodu
+order by sum(sut_tutar) 
+
+
+alter PROCEDURE [bawary_sut].musteri_ekle (
+	
+	 @p1 int)
+AS
+BEGIN
+	
+	SET NOCOUNT ON;
+select alinan_sut.musteri_kodu,sum(sut_tutar) as sut_tutar,sum(urun_tutar) as urun_tutar
+from alinan_sut
+inner join alinan_urun on alinan_sut.musteri_kodu=alinan_urun.musteri_kodu
+where alinan_sut.musteri_kodu=@p1
+group by alinan_sut.musteri_kodu
+END
+GO
+
+
+alter PROCEDURE tarih_kontrol 
+ 
+@p1 date,
+@p2 date
+
+AS
+BEGIN
+ select sum(sut_tutar)
+ from alinan_sut
+ where tarih between @p1 and @p2
+END
+GO
+
+
